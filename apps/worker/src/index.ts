@@ -79,6 +79,8 @@ import adminUpdate from './routes/admin-update.js';
 export type Env = {
   Bindings: {
     DB: D1Database;
+    // バス予約DB（別バインディングで参照。データ統合せず独立維持）
+    BUS_DB: D1Database;
     IMAGES: R2Bucket;
     ASSETS: Fetcher;
     LINE_CHANNEL_SECRET: string;

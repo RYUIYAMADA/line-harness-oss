@@ -23,6 +23,7 @@ import {
 import type { EntryRoute } from '@line-crm/db';
 import { fireEvent } from '../services/event-bus.js';
 import { buildMessage, expandVariables } from '../services/step-delivery.js';
+import { isBusAccount, handleBusFollow, handleBusPostback } from './bus-webhook.js';
 import type { Env } from '../index.js';
 
 const webhook = new Hono<Env>();
@@ -124,7 +125,7 @@ webhook.post('/webhook', async (c) => {
   const processingPromise = (async () => {
     for (const event of body.events) {
       try {
-        await handleEvent(db, lineClient, event, channelAccessToken, matchedAccountId, c.env.WORKER_URL || new URL(c.req.url).origin, c.env.LIFF_URL, c.env.IMAGES);
+        await handleEvent(db, lineClient, event, channelAccessToken, matchedAccountId, c.env.WORKER_URL || new URL(c.req.url).origin, c.env.LIFF_URL, c.env.IMAGES, (c.env as unknown as { BUS_LINE_ACCOUNT_ID?: string }).BUS_LINE_ACCOUNT_ID);
       } catch (err) {
         console.error('Error handling webhook event:', err);
       }
@@ -145,7 +146,35 @@ async function handleEvent(
   workerUrl?: string,
   liffUrl?: string,
   r2?: R2Bucket,
+  busLineAccountId?: string,
 ): Promise<void> {
+  // ─── バスアカウント専用ルーティング（スライス 0）────────────────────────
+  // matchedAccountId が BUS_LINE_ACCOUNT_ID に一致する場合、バス専用ハンドラへ委譲。
+  // follow / postback はバス専用処理で完結し早期 return する。
+  // その他イベント（message 等）は現状スルー（通常ルートへフォールスルー）。
+  if (lineAccountId && isBusAccount(lineAccountId, busLineAccountId)) {
+    if (event.type === 'follow') {
+      await handleBusFollow(
+        event as WebhookEvent & { type: 'follow' },
+        lineClient,
+        db,
+        lineAccountId,
+      );
+      return;
+    }
+    if (event.type === 'postback') {
+      await handleBusPostback(
+        event as WebhookEvent & { type: 'postback' },
+        lineClient,
+        db,
+        lineAccountId,
+      );
+      return;
+    }
+    // unfollow / message 等は通常ルートに流す（友だち登録解除・メッセージログは共通処理で可）
+  }
+  // ─── 通常ルート ──────────────────────────────────────────────────────────
+
   if (event.type === 'follow') {
     const userId =
       event.source.type === 'user' ? event.source.userId : undefined;
