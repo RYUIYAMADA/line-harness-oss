@@ -22,7 +22,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "line-harness"
-database_id = "YOUR_DEV_D1_DATABASE_ID"
+database_id = "4dcf4a14-1555-40af-a147-f5a479677409"
 
 # バス予約DBは別バインディングで参照（データ統合せず・ロールバック容易）
 [[d1_databases]]
@@ -46,7 +46,7 @@ crons = ["*/5 * * * *", "0 */6 * * *"]
 WORKER_NAME = "line-harness"
 ADMIN_PAGES_PROJECT = "line-harness-admin"
 LIFF_PAGES_PROJECT = "line-harness-liff"
-D1_DATABASE_ID = "YOUR_DEV_D1_DATABASE_ID"
+D1_DATABASE_ID = "4dcf4a14-1555-40af-a147-f5a479677409"
 MANIFEST_URL = "https://github.com/Shudesu/line-harness-oss/releases/latest/download/release-manifest.json"
 WORKER_PUBLIC_URL = "https://line-harness.workers.dev"
 ADMIN_PUBLIC_URL = "https://line-harness-admin.pages.dev"
@@ -68,7 +68,7 @@ binding = "ASSETS"
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "line-crm"
-database_id = "YOUR_D1_DATABASE_ID"
+database_id = "4dcf4a14-1555-40af-a147-f5a479677409"
 
 # バス予約DBは別バインディングで参照（データ統合せず・ロールバック容易）
 [[env.production.d1_databases]]
@@ -87,12 +87,12 @@ crons = ["*/5 * * * *", "0 */6 * * *"]
 # the prod resources. Secrets (CF_API_TOKEN, ADMIN_API_KEY) live in the
 # production secret store, set via `wrangler secret put --env production`.
 [env.production.vars]
-WORKER_NAME = "your-worker-name"
+WORKER_NAME = "line-harness"
 ADMIN_PAGES_PROJECT = "line-harness-admin"
 LIFF_PAGES_PROJECT = "line-harness-liff"
-D1_DATABASE_ID = "YOUR_D1_DATABASE_ID"
+D1_DATABASE_ID = "4dcf4a14-1555-40af-a147-f5a479677409"
 MANIFEST_URL = "https://github.com/Shudesu/line-harness-oss/releases/latest/download/release-manifest.json"
-WORKER_PUBLIC_URL = "https://your-worker-name.workers.dev"
+WORKER_PUBLIC_URL = "https://line-harness.row2014-2015-k.workers.dev"
 ADMIN_PUBLIC_URL = "https://line-harness-admin.pages.dev"
 LIFF_PUBLIC_URL = "https://line-harness-liff.pages.dev"
-CF_ACCOUNT_ID = "YOUR_ACCOUNT_ID"
+CF_ACCOUNT_ID = "4dcd341cc61e782dfb44bfe46eee8439"

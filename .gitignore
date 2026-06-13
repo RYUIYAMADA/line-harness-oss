@@ -15,3 +15,7 @@ apps/web/out/
 apps/worker/dist/
 .worktrees/
 .claude/worktrees/
+# 秘密情報ファイル — 絶対にコミットしない
+.dev.vars
+apps/worker/.dev.vars
+apps/liff/.dev.vars
