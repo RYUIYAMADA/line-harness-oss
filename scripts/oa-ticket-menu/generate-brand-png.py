@@ -316,5 +316,119 @@ def main():
     print("PNG生成完了")
 
 
+def main_half():
+    """
+    小テンプレ版: 2500×843（LINE small rich-menu）
+    design-rules.json required: rich-menu-dimensions size-half (2500x843)
+    """
+    print("PNG生成開始: 2500×843 白背景・DS準拠版（小テンプレ）")
+
+    W_H  = 2500
+    H_H  = 843
+    DIVX = W_H // 2   # 1250
+
+    img  = Image.new('RGBA', (W_H, H_H), (*BG, 255))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([0, 0, W_H, H_H], fill=(*BG, 255))
+
+    # 左パネル極薄ピンク
+    left_tint = Image.new('RGBA', (W_H, H_H), (0, 0, 0, 0))
+    lt_draw   = ImageDraw.Draw(left_tint)
+    lt_draw.rectangle([0, 0, DIVX, H_H], fill=(*PINK, 10))
+    img.alpha_composite(left_tint)
+
+    # 右パネル極薄ゴールド
+    right_tint = Image.new('RGBA', (W_H, H_H), (0, 0, 0, 0))
+    rt_draw    = ImageDraw.Draw(right_tint)
+    rt_draw.rectangle([DIVX, 0, W_H, H_H], fill=(*GOLD, 8))
+    img.alpha_composite(right_tint)
+
+    draw = ImageDraw.Draw(img)
+
+    # 上端アクセントバー（高さ8px・大版より細め）
+    draw.rectangle([80, 0, DIVX - 80, 8], fill=PINK)
+    draw.rectangle([DIVX + 80, 0, W_H - 80, 8], fill=GOLD)
+
+    # 中央分割線
+    div_overlay = Image.new('RGBA', (W_H, H_H), (0, 0, 0, 0))
+    dv_draw     = ImageDraw.Draw(div_overlay)
+    dv_draw.line([(DIVX, 20), (DIVX, H_H - 20)], fill=(*DIVIDER_COLOR, 255), width=3)
+    img.alpha_composite(div_overlay)
+
+    draw = ImageDraw.Draw(img)
+
+    # アイコン（843px高さに最適化: 大版icon_size=320 → 150に縮小）
+    icon_size = 150
+    center_y  = H_H // 2     # 421
+    icon_y    = center_y - 110  # アイコン中心Y（テキスト分を上に確保）
+
+    draw_ticket_icon   (draw, DIVX // 2,        icon_y, icon_size, PINK)
+    draw_clipboard_icon(draw, DIVX + DIVX // 2, icon_y, icon_size, GOLD)
+
+    # フォントサイズ（843px高さ最適化）
+    # DS no-rich-menu-small-text: 実画像28px以上必須
+    # 843pxは1686pxの半分 → 大版(160px)の約55% = 88px でバランス良し
+    font_ja_lg  = try_load_font(88)        # 予約する
+    font_ja_md  = try_load_font(84)        # 申し込み確認
+    font_en     = try_load_font_medium(44) # Reserve / Check Status
+
+    text_top_y = icon_y + icon_size // 2 + 32  # アイコン下端+余白
+
+    # 左: 「予約する」
+    label_left_ja = '予約する'
+    bb = draw.textbbox((0, 0), label_left_ja, font=font_ja_lg)
+    tw = bb[2] - bb[0]
+    th = bb[3] - bb[1]
+    draw.text((DIVX // 2 - tw // 2, text_top_y), label_left_ja, font=font_ja_lg, fill=TEXT)
+
+    # 左: 「Reserve」
+    label_left_en = 'Reserve'
+    bb_en = draw.textbbox((0, 0), label_left_en, font=font_en)
+    ew = bb_en[2] - bb_en[0]
+    draw.text((DIVX // 2 - ew // 2, text_top_y + th + 14), label_left_en, font=font_en, fill=PINK)
+
+    # 右: 「申し込み確認」
+    label_right_ja = '申し込み確認'
+    bb_r = draw.textbbox((0, 0), label_right_ja, font=font_ja_md)
+    tw_r = bb_r[2] - bb_r[0]
+    th_r = bb_r[3] - bb_r[1]
+    rx_center = DIVX + DIVX // 2
+    draw.text((rx_center - tw_r // 2, text_top_y), label_right_ja, font=font_ja_md, fill=TEXT)
+
+    # 右: 「Check Status」
+    label_right_en = 'Check Status'
+    bb_en_r = draw.textbbox((0, 0), label_right_en, font=font_en)
+    ew_r = bb_en_r[2] - bb_en_r[0]
+    draw.text((rx_center - ew_r // 2, text_top_y + th_r + 14), label_right_en, font=font_en, fill=GOLD)
+
+    # 下端アクセント細線
+    draw.rectangle([80, H_H - 6, DIVX - 80, H_H - 3], fill=(*GOLD, 120))
+    draw.rectangle([DIVX + 80, H_H - 6, W_H - 80, H_H - 3], fill=(*GOLD, 120))
+
+    # 保存
+    final    = img.convert('RGB')
+    out_path = (
+        '/Users/ryuiyamada/Desktop/ryui-workspace/projects/line-dev/'
+        'harness/scripts/oa-ticket-menu/hapinets-ticket-menu-2500x843.png'
+    )
+    final.save(out_path, 'PNG', optimize=False)
+
+    # サイズQA
+    check = Image.open(out_path)
+    aw, ah = check.size
+    if aw == 2500 and ah == 843:
+        print(f"QA PASS: {aw}×{ah} == 宣言サイズ 2500×843")
+    else:
+        print(f"QA FAIL: {aw}×{ah} ≠ 2500×843", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"出力: {out_path}")
+    print("PNG生成完了（小テンプレ 2500×843）")
+
+
 if __name__ == '__main__':
-    main()
+    import sys as _sys
+    if len(_sys.argv) > 1 and _sys.argv[1] == 'half':
+        main_half()
+    else:
+        main()
