@@ -237,8 +237,8 @@ def main():
     #    DS no-rich-menu-small-text: リッチメニュー内 24px 未満禁止
     #    2500px幅→LINE縮小後で読める: 実画像 160px≒縮小後80px 相当（安全）
     font_ja_lg  = try_load_font(160)        # 予約する（4文字）
-    font_ja_md  = try_load_font(145)        # マイ申込状況（6文字）
-    font_en     = try_load_font_medium(82)  # Reserve / My Status
+    font_ja_md  = try_load_font(155)        # 申し込み確認（6文字）
+    font_en     = try_load_font_medium(82)  # Reserve / Check Status
 
     center_y = H // 2
 
@@ -267,8 +267,8 @@ def main():
         fill=PINK
     )
 
-    # ── 右: 日本語ラベル「マイ申込状況」
-    label_right_ja = 'マイ申込状況'
+    # ── 右: 日本語ラベル「申し込み確認」
+    label_right_ja = '申し込み確認'
     bb_r = draw.textbbox((0, 0), label_right_ja, font=font_ja_md)
     tw_r = bb_r[2] - bb_r[0]
     th_r = bb_r[3] - bb_r[1]
@@ -280,8 +280,8 @@ def main():
         fill=TEXT
     )
 
-    # ── 右: 英語ラベル「My Status」
-    label_right_en = 'My Status'
+    # ── 右: 英語ラベル「Check Status」
+    label_right_en = 'Check Status'
     bb_en_r = draw.textbbox((0, 0), label_right_en, font=font_en)
     ew_r = bb_en_r[2] - bb_en_r[0]
     draw.text(
