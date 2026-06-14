@@ -23,7 +23,7 @@ import {
 import type { EntryRoute } from '@line-crm/db';
 import { fireEvent } from '../services/event-bus.js';
 import { buildMessage, expandVariables } from '../services/step-delivery.js';
-import { isBusAccount, handleBusFollow, handleBusPostback } from './bus-webhook.js';
+import { isBusAccount, handleBusFollow, handleBusMessage, handleBusPostback } from './bus-webhook.js';
 import type { Env } from '../index.js';
 
 const webhook = new Hono<Env>();
@@ -162,6 +162,15 @@ async function handleEvent(
       );
       return;
     }
+    if (event.type === 'message') {
+      await handleBusMessage(
+        event as WebhookEvent & { type: 'message' },
+        lineClient,
+        db,
+        lineAccountId,
+      );
+      return;
+    }
     if (event.type === 'postback') {
       await handleBusPostback(
         event as WebhookEvent & { type: 'postback' },
@@ -171,7 +180,7 @@ async function handleEvent(
       );
       return;
     }
-    // unfollow / message 等は通常ルートに流す（友だち登録解除・メッセージログは共通処理で可）
+    // unfollow 等は通常ルートに流す（友だち登録解除は共通処理で可）
   }
   // ─── 通常ルート ──────────────────────────────────────────────────────────
 

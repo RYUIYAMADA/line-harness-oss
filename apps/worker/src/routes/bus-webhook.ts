@@ -1,11 +1,12 @@
 /**
  * bus-webhook.ts
  *
- * バス予約アカウント専用 Webhook イベントハンドラ（スライス 0）
+ * バス予約アカウント専用 Webhook イベントハンドラ（フルパリティ実装）
  *
  * 責務:
- *   - follow: バス予約ウェルカム Flex を返信
- *   - postback: bus:menu / bus:myres を処理（スライス 1 以降で拡充）
+ *   - follow:   あいさつテキスト + 予約案内 Flex を返信（旧 bus-reservation-api/webhook.ts 相当）
+ *   - message:  任意テキスト受信 → 予約案内 Flex を返信
+ *   - postback: bus:menu → 予約案内 Flex / bus:myres → マイ予約 LIFF URL テキスト
  *
  * 呼び出し元: apps/worker/src/routes/webhook.ts の handleEvent
  * 条件:       matchedAccountId が BUS_LINE_ACCOUNT_ID env に一致した場合
@@ -14,11 +15,21 @@
  *   - BUS_LINE_ACCOUNT_ID は wrangler secret put で設定
  *     （harness の line_accounts テーブルに登録したバスアカウントの UUID）
  *   - BUS_DB は wrangler.toml に追加済み（バスのD1を別バインディングで参照）
+ *
+ * [注意] OA（公式アカウント）あいさつが有効の場合、follow 時にあいさつが二重になる。
+ *        LINE Developers Console → Messaging API → あいさつメッセージ を OFF 推奨。
  */
 
 import type { WebhookEvent, Message } from '@line-crm/line-sdk';
 import { LineClient } from '@line-crm/line-sdk';
 import { jstNow } from '@line-crm/db';
+
+// ─── LIFF URL（旧 bus-reservation-api/workers/src/webhook.ts WEBHOOK_LINKS と同値）─
+// LIFF再発行時はここを変更する。
+const BUS_LIFF_RESERVE = 'https://liff.line.me/2010371178-BqRvQ1H1';
+const BUS_RESERVE_DIRECT = 'https://bus-reservation-api.row2014-2015-k.workers.dev/reserve'; // PC版LINE用
+const BUS_GUIDE = 'https://bus-reservation-api.row2014-2015-k.workers.dev/guide';
+// ────────────────────────────────────────────────────────────────────────────────────
 
 /**
  * バスアカウントかどうかを判定する。
@@ -36,8 +47,109 @@ export function isBusAccount(
 }
 
 /**
- * バス予約アカウント向けの follow Flex メッセージ本体。
- * LINE Flex Message（bubble）形式。
+ * あいさつテキスト（follow イベント用）。
+ * 旧 webhook.ts の buildGreetingText() と同内容。
+ */
+function buildBusGreetingText(): Message {
+  return {
+    type: 'text',
+    text: 'ご登録ありがとうございます！🎉\n秋田ノーザンハピネッツ シャトルバス予約サービスです。',
+  } as unknown as Message;
+}
+
+/**
+ * バス予約案内 Flex メッセージ（bubble）。
+ * 旧 webhook.ts の buildReservationFlex() と同内容。
+ * follow / message(text) / postback bus:menu で共用する。
+ */
+function buildBusReservationFlex(): Message {
+  return {
+    type: 'flex',
+    altText: '🚌 プライウッド行きシャトルバス予約案内',
+    contents: {
+      type: 'bubble',
+      header: {
+        type: 'box',
+        layout: 'vertical',
+        contents: [
+          {
+            type: 'text',
+            text: '🚌 プライウッド行きシャトルバス',
+            weight: 'bold',
+            size: 'md',
+            color: '#ffffff',
+            wrap: true,
+          },
+        ],
+        backgroundColor: '#EC008C',
+        paddingAll: '16px',
+      },
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'sm',
+        contents: [
+          {
+            type: 'text',
+            text: '・予約優先でご乗車いただけます',
+            wrap: true,
+            size: 'sm',
+            color: '#333333',
+          },
+          {
+            type: 'text',
+            text: '・お連れ様を含めて1〜8名までまとめて予約OK',
+            wrap: true,
+            size: 'sm',
+            color: '#333333',
+          },
+          {
+            type: 'text',
+            text: '・出発時刻は決まり次第LINEでお知らせします',
+            wrap: true,
+            size: 'sm',
+            color: '#333333',
+          },
+        ],
+        paddingAll: '16px',
+      },
+      footer: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'sm',
+        contents: [
+          {
+            type: 'button',
+            style: 'primary',
+            color: '#EC008C',
+            action: {
+              type: 'uri',
+              label: 'バスを予約する',
+              uri: BUS_LIFF_RESERVE,
+              altUri: { desktop: BUS_RESERVE_DIRECT },
+            },
+          },
+          {
+            type: 'button',
+            style: 'link',
+            action: {
+              type: 'uri',
+              label: '乗車案内を見る',
+              uri: BUS_GUIDE,
+            },
+          },
+        ],
+        paddingAll: '12px',
+      },
+    },
+  } as unknown as Message;
+}
+
+/**
+ * バス予約アカウント向けの follow Flex メッセージ本体（旧 buildBusFollowFlex）。
+ * 現在は buildBusReservationFlex に統一したため未使用。
+ * follow 応答は handleBusFollow 内で buildBusGreetingText + buildBusReservationFlex を返す。
+ * @deprecated 削除予定。旧参照用に残す。
  */
 function buildBusFollowFlex(): Message {
   return {
@@ -172,10 +284,11 @@ export async function handleBusFollow(
 
   console.log(`[bus:follow] userId=${userId ?? 'unknown'} accountId=${lineAccountId}`);
 
-  // ウェルカム Flex を返信
+  // あいさつテキスト + 予約案内 Flex を返信（旧 bus-reservation-api 相当の2メッセージ）
+  // [注意] OA あいさつが有効だと二重になる → LINE Developers Console でOFF推奨
   try {
-    await lineClient.replyMessage(replyToken, [buildBusFollowFlex()]);
-    console.log(`[bus:follow] welcome flex sent to userId=${userId ?? 'unknown'}`);
+    await lineClient.replyMessage(replyToken, [buildBusGreetingText(), buildBusReservationFlex()]);
+    console.log(`[bus:follow] greeting+flex sent to userId=${userId ?? 'unknown'}`);
   } catch (err) {
     console.error('[bus:follow] replyMessage failed:', err);
   }
@@ -185,8 +298,8 @@ export async function handleBusFollow(
     try {
       const welcomeContent = JSON.stringify({
         type: 'flex',
-        altText: 'ハピネッツ シャトルバス予約サービスへようこそ！',
-        contents: (buildBusFollowFlex() as unknown as { contents: unknown }).contents,
+        altText: '🚌 プライウッド行きシャトルバス予約案内',
+        contents: (buildBusReservationFlex() as unknown as { contents: unknown }).contents,
       });
 
       // friends テーブルから friend.id を逆引き
@@ -218,9 +331,43 @@ export async function handleBusFollow(
 }
 
 /**
- * バスアカウントの postback イベントを処理する（スライス 0 最小実装）。
- * bus:menu / bus:myres に対してテキスト応答を返す。
- * スライス 3（予約API移植）以降で LIFF URL 返信に差し替える。
+ * バスアカウントの text message イベントを処理する。
+ * 任意のテキスト受信 → 予約案内 Flex を返す（旧 bus-reservation-api 相当）。
+ *
+ * @param event         - LINE WebhookEvent（type === 'message' かつ message.type === 'text'）
+ * @param lineClient    - 署名検証済みの LineClient（バスアカウントのトークン）
+ * @param db            - harness の D1Database（未使用だが一貫性のため引数に含む）
+ * @param lineAccountId - バスアカウントの line_accounts.id
+ */
+export async function handleBusMessage(
+  event: WebhookEvent & { type: 'message' },
+  lineClient: LineClient,
+  db: D1Database,
+  lineAccountId: string,
+): Promise<void> {
+  const replyToken = (event as unknown as { replyToken?: string }).replyToken;
+  const userId = event.source.type === 'user' ? event.source.userId : undefined;
+
+  console.log(`[bus:message] userId=${userId ?? 'unknown'} accountId=${lineAccountId}`);
+
+  if (!replyToken) return;
+
+  // テキスト以外（スタンプ・画像等）は無視（通常ルートのログ処理に任せる）
+  const msg = event.message as { type: string };
+  if (msg.type !== 'text') return;
+
+  try {
+    await lineClient.replyMessage(replyToken, [buildBusReservationFlex()]);
+    console.log(`[bus:message] reservation flex sent to userId=${userId ?? 'unknown'}`);
+  } catch (err) {
+    console.error('[bus:message] replyMessage failed:', err);
+  }
+}
+
+/**
+ * バスアカウントの postback イベントを処理する（フルパリティ実装）。
+ * bus:menu → 予約案内 Flex / bus:myres → マイ予約 LIFF URL テキスト
+ * 旧 bus-reservation-api/workers/src/webhook.ts の postback 処理と同等。
  *
  * @param event         - LINE WebhookEvent（type === 'postback' であること）
  * @param lineClient    - 署名検証済みの LineClient（バスアカウントのトークン）
@@ -241,23 +388,24 @@ export async function handleBusPostback(
 
   if (!replyToken) return;
 
-  // bus:menu — 予約メニューへ誘導（スライス 3 以降で LIFF URL 返信に差し替え）
+  // bus:menu — 旧workerと同じ: 予約案内 Flex を返す
   if (postbackData === 'bus:menu') {
     try {
-      await lineClient.replyMessage(replyToken, [
-        { type: 'text', text: '予約ページの準備中です。しばらくお待ちください。' } as Message,
-      ]);
+      await lineClient.replyMessage(replyToken, [buildBusReservationFlex()]);
     } catch (err) {
       console.error('[bus:postback] bus:menu reply failed:', err);
     }
     return;
   }
 
-  // bus:myres — 予約確認へ誘導（スライス 3 以降で LIFF URL 返信に差し替え）
+  // bus:myres — 旧workerと同じ: マイ予約・QRの LIFF URL をテキストで返す
   if (postbackData === 'bus:myres') {
     try {
       await lineClient.replyMessage(replyToken, [
-        { type: 'text', text: '予約確認ページの準備中です。しばらくお待ちください。' } as Message,
+        {
+          type: 'text',
+          text: `マイ予約・QRコードの確認はこちらをタップ👇\n${BUS_LIFF_RESERVE}`,
+        } as unknown as Message,
       ]);
     } catch (err) {
       console.error('[bus:postback] bus:myres reply failed:', err);
