@@ -115,6 +115,9 @@ export type Env = {
     WORKER_PUBLIC_URL?: string;
     ADMIN_PUBLIC_URL?: string;
     LIFF_PUBLIC_URL?: string;
+    // バスアカウントの line_accounts.id（UUID）。wrangler secret put で設定。
+    // 設定された場合、該当アカウントの Webhook はバス専用ハンドラへルーティングされる。
+    BUS_LINE_ACCOUNT_ID?: string;
   };
   Variables: {
     staff: { id: string; name: string; role: 'owner' | 'admin' | 'staff' };

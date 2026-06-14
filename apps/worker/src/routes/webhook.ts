@@ -125,7 +125,7 @@ webhook.post('/webhook', async (c) => {
   const processingPromise = (async () => {
     for (const event of body.events) {
       try {
-        await handleEvent(db, lineClient, event, channelAccessToken, matchedAccountId, c.env.WORKER_URL || new URL(c.req.url).origin, c.env.LIFF_URL, c.env.IMAGES, (c.env as unknown as { BUS_LINE_ACCOUNT_ID?: string }).BUS_LINE_ACCOUNT_ID);
+        await handleEvent(db, lineClient, event, channelAccessToken, matchedAccountId, c.env.WORKER_URL || new URL(c.req.url).origin, c.env.LIFF_URL, c.env.IMAGES, c.env.BUS_LINE_ACCOUNT_ID);
       } catch (err) {
         console.error('Error handling webhook event:', err);
       }
@@ -148,39 +148,13 @@ async function handleEvent(
   r2?: R2Bucket,
   busLineAccountId?: string,
 ): Promise<void> {
-  // ─── バスアカウント専用ルーティング（スライス 0）────────────────────────
-  // matchedAccountId が BUS_LINE_ACCOUNT_ID に一致する場合、バス専用ハンドラへ委譲。
-  // follow / postback はバス専用処理で完結し早期 return する。
-  // その他イベント（message 等）は現状スルー（通常ルートへフォールスルー）。
-  if (lineAccountId && isBusAccount(lineAccountId, busLineAccountId)) {
-    if (event.type === 'follow') {
-      await handleBusFollow(
-        event as WebhookEvent & { type: 'follow' },
-        lineClient,
-        db,
-        lineAccountId,
-      );
-      return;
-    }
-    if (event.type === 'message') {
-      await handleBusMessage(
-        event as WebhookEvent & { type: 'message' },
-        lineClient,
-        db,
-        lineAccountId,
-      );
-      return;
-    }
-    if (event.type === 'postback') {
-      await handleBusPostback(
-        event as WebhookEvent & { type: 'postback' },
-        lineClient,
-        db,
-        lineAccountId,
-      );
-      return;
-    }
-    // unfollow 等は通常ルートに流す（友だち登録解除は共通処理で可）
+  // ─── バスアカウント判定（BUS_LINE_ACCOUNT_ID 未設定は fail-closed）────────
+  // BUS_LINE_ACCOUNT_ID が設定されていない場合、バス署名一致でも黙ってフェイルオープン
+  // させてはならない（意図しない通常 CRM 処理への混入を防ぐ）。
+  // 代わりにエラーログを出して通常ルートをそのまま実行する（データは残るが専用返信なし）。
+  const isBus = isBusAccount(lineAccountId, busLineAccountId);
+  if (isBus && !busLineAccountId) {
+    console.error('[bus] BUS_LINE_ACCOUNT_ID is not configured. Bus-specific reply skipped (fail-closed).');
   }
   // ─── 通常ルート ──────────────────────────────────────────────────────────
 
@@ -358,6 +332,18 @@ async function handleEvent(
       }
     }
 
+    // ─── バスアカウント専用: follow 後にあいさつ+Flex を返信 ─────────────────
+    // harnessコアの友だち登録・line_account_id紐付け・シナリオ登録を先に完了してから
+    // バス専用の返信のみ行う（replyToken はコアのシナリオ即時配信で消費済みの場合あり）。
+    if (isBus && busLineAccountId) {
+      await handleBusFollow(
+        event as WebhookEvent & { type: 'follow' },
+        lineClient,
+        db,
+        lineAccountId!,
+      );
+    }
+
     // イベントバス発火: friend_add（replyToken は Step 0 で使用済みの可能性あり）
     await fireEvent(db, 'friend_add', { friendId: friend.id, eventData: { displayName: friend.display_name } }, lineAccessToken, lineAccountId);
     return;
@@ -414,6 +400,7 @@ async function handleEvent(
       console.error('Failed to log incoming postback', err);
     }
 
+    let postbackAutoReplyMatched = false;
     for (const rule of autoReplies.results) {
       const isMatch = rule.match_type === 'exact'
         ? postbackData === rule.keyword
@@ -446,9 +433,26 @@ async function handleEvent(
         } catch (err) {
           console.error('Failed to send postback reply', err);
         }
+        postbackAutoReplyMatched = true;
         break;
       }
     }
+
+    // ─── バスアカウント専用: postback ─────────────────────────────────────
+    // auto_replies にマッチしなかった場合のみバス専用ハンドラへ委譲する。
+    // replyToken は autoReplies ループで消費されている可能性があるため、
+    // auto_reply でマッチした（postbackAutoReplyMatched=true）場合はスキップ。
+    // handleBusPostback は旧workerのセマンティクスに完全一致:
+    //   bus:myres → テキスト / bus:menu → Flex / その他 → Flex (else)
+    if (isBus && busLineAccountId && !postbackAutoReplyMatched) {
+      await handleBusPostback(
+        event as WebhookEvent & { type: 'postback' },
+        lineClient,
+        db,
+        lineAccountId!,
+      );
+    }
+
     return;
   }
 
@@ -665,12 +669,24 @@ async function handleEvent(
       await upsertChatOnMessage(db, friend.id);
     }
 
+    // ─── バスアカウント専用: テキスト受信 → 予約案内 Flex ──────────────────
+    // auto_reply がマッチしなかった（replyToken 未消費）かつバスアカウントの場合のみ返信。
+    // 非テキストはこのブロックに入らないため harnessコアのログ処理が確実に動く。
+    if (isBus && busLineAccountId && !replyTokenConsumed) {
+      await handleBusMessage(
+        event as WebhookEvent & { type: 'message' },
+        lineClient,
+        db,
+        lineAccountId!,
+      );
+    }
+
     // イベントバス発火: message_received
     // Pass replyToken only when auto_reply didn't actually consume it
     await fireEvent(db, 'message_received', {
       friendId: friend.id,
       eventData: { text: incomingText, matched },
-      replyToken: replyTokenConsumed ? undefined : event.replyToken,
+      replyToken: (replyTokenConsumed || (isBus && busLineAccountId)) ? undefined : event.replyToken,
     }, lineAccessToken, lineAccountId);
 
     return;

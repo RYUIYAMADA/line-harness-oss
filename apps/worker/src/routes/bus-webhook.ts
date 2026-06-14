@@ -146,122 +146,6 @@ function buildBusReservationFlex(): Message {
 }
 
 /**
- * バス予約アカウント向けの follow Flex メッセージ本体（旧 buildBusFollowFlex）。
- * 現在は buildBusReservationFlex に統一したため未使用。
- * follow 応答は handleBusFollow 内で buildBusGreetingText + buildBusReservationFlex を返す。
- * @deprecated 削除予定。旧参照用に残す。
- */
-function buildBusFollowFlex(): Message {
-  return {
-    type: 'flex',
-    altText: 'ハピネッツ シャトルバス予約サービスへようこそ！',
-    contents: {
-      type: 'bubble',
-      size: 'giga',
-      header: {
-        type: 'box',
-        layout: 'vertical',
-        paddingAll: '20px',
-        backgroundColor: '#1e3a5f',
-        contents: [
-          {
-            type: 'text',
-            text: 'ハピネッツ シャトルバス',
-            size: 'xl',
-            weight: 'bold',
-            color: '#ffffff',
-          },
-          {
-            type: 'text',
-            text: '公式予約サービス',
-            size: 'sm',
-            color: '#93c5fd',
-            margin: 'xs',
-          },
-        ],
-      },
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        paddingAll: '20px',
-        contents: [
-          {
-            type: 'text',
-            text: 'ご登録ありがとうございます！',
-            size: 'md',
-            weight: 'bold',
-            color: '#1e293b',
-          },
-          {
-            type: 'text',
-            text: 'このアカウントでシャトルバスの予約・確認ができます。下のメニューからご利用ください。',
-            size: 'sm',
-            color: '#475569',
-            wrap: true,
-            margin: 'md',
-          },
-          {
-            type: 'separator',
-            margin: 'lg',
-          },
-          {
-            type: 'box',
-            layout: 'vertical',
-            margin: 'lg',
-            contents: [
-              {
-                type: 'text',
-                text: '利用方法',
-                size: 'xs',
-                color: '#64748b',
-                weight: 'bold',
-              },
-              {
-                type: 'text',
-                text: '① 試合日程を確認する\n② 乗りたい便を選んで予約する\n③ 当日、QRコードで乗車',
-                size: 'sm',
-                color: '#1e293b',
-                wrap: true,
-                margin: 'sm',
-              },
-            ],
-          },
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        paddingAll: '16px',
-        gap: 'sm',
-        contents: [
-          {
-            type: 'button',
-            action: {
-              type: 'postback',
-              label: '予約する',
-              data: 'bus:menu',
-              displayText: 'バスを予約する',
-            },
-            style: 'primary',
-            color: '#1e3a5f',
-          },
-          {
-            type: 'button',
-            action: {
-              type: 'postback',
-              label: '予約を確認する',
-              data: 'bus:myres',
-              displayText: '予約を確認する',
-            },
-            style: 'secondary',
-          },
-        ],
-      },
-    },
-  } as unknown as Message;
-}
-
-/**
  * バスアカウントの follow イベントを処理する。
  * ウェルカム Flex を replyMessage で返す。
  *
@@ -388,16 +272,6 @@ export async function handleBusPostback(
 
   if (!replyToken) return;
 
-  // bus:menu — 旧workerと同じ: 予約案内 Flex を返す
-  if (postbackData === 'bus:menu') {
-    try {
-      await lineClient.replyMessage(replyToken, [buildBusReservationFlex()]);
-    } catch (err) {
-      console.error('[bus:postback] bus:menu reply failed:', err);
-    }
-    return;
-  }
-
   // bus:myres — 旧workerと同じ: マイ予約・QRの LIFF URL をテキストで返す
   if (postbackData === 'bus:myres') {
     try {
@@ -413,6 +287,12 @@ export async function handleBusPostback(
     return;
   }
 
-  // 未知の bus: プレフィックス postback は無視（通常ルートで処理させない）
-  console.log(`[bus:postback] unhandled postback data=${postbackData}`);
+  // bus:menu およびその他全ての postback → 予約案内 Flex（旧workerの else セマンティクス）
+  // 旧 bus-reservation-api/workers/src/webhook.ts: if (data === 'bus:myres') { ... } else { Flex }
+  try {
+    await lineClient.replyMessage(replyToken, [buildBusReservationFlex()]);
+    console.log(`[bus:postback] reservation flex sent for data=${postbackData}`);
+  } catch (err) {
+    console.error('[bus:postback] reservation flex reply failed:', err);
+  }
 }
