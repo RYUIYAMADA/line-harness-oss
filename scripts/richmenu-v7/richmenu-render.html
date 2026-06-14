@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rich Menu v7 — 2500x843</title>
+<style>
+  /* Design tokens — line-dev DESIGN.md + ryuiyamada-design-system */
+  :root {
+    --color-primary:   #C8102E;   /* ハピネッツ赤 */
+    --color-secondary: #1A1A2E;   /* 濃いネイビー */
+    --color-line:      #06C755;   /* LINE グリーン */
+    --color-bg:        #FFFFFF;
+    --color-bg-muted:  #F5F5F7;
+    --color-text:      #1A1A2E;
+    --color-text-muted:#6B7280;
+    --color-accent:    #FFD700;
+    --navy:            #152E58;
+    --navy-600:        #264E96;
+
+    /* Rich menu pixel dimensions (2500x843) */
+    --rm-width:  2500px;
+    --rm-height: 843px;
+    --left-w:    1500px;
+    --right-w:   1000px;
+    --right-h1:  420px;
+    --right-h2:  423px;
+
+    /* Borders */
+    --border-gap: 3px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+  }
+
+  body {
+    width: var(--rm-width);
+    height: var(--rm-height);
+    overflow: hidden;
+    background: var(--color-secondary);
+  }
+
+  #richmenu {
+    display: flex;
+    width: var(--rm-width);
+    height: var(--rm-height);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ============================================================
+     LEFT PANEL — 試合情報 / Match Info  (1500x843)
+     Action: URI → 試合情報LP
+  ============================================================ */
+  .panel-left {
+    width: var(--left-w);
+    height: var(--rm-height);
+    background: var(--color-secondary);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: var(--border-gap) solid rgba(255,255,255,0.15);
+    overflow: hidden;
+  }
+
+  /* Background accent stripe */
+  .panel-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(135deg, rgba(200,16,46,0.18) 0%, transparent 60%),
+      linear-gradient(225deg, rgba(21,46,88,0.5) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Red accent bar at top */
+  .panel-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: var(--color-primary);
+  }
+
+  .left-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    text-align: center;
+    padding: 60px 80px;
+  }
+
+  /* Icon — calendar/match info */
+  .icon-wrap {
+    width: 120px;
+    height: 120px;
+    border: 4px solid rgba(200,16,46,0.7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(200,16,46,0.12);
+  }
+
+  .icon-wrap svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .left-label-en {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .left-label-ja {
+    font-size: 64px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .left-label-sub {
+    font-size: 28px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+  }
+
+  .left-caret {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .left-caret svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* ============================================================
+     RIGHT PANEL — 2 stacked buttons (1000px wide)
+  ============================================================ */
+  .panel-right {
+    width: var(--right-w);
+    height: var(--rm-height);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- RIGHT TOP — バスを予約する / Reserve Bus (1000x420) ---- */
+  .btn-reserve {
+    width: var(--right-w);
+    height: var(--right-h1);
+    background: var(--color-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    border-bottom: var(--border-gap) solid rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-reserve::before {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
+  }
+
+  .btn-reserve::after {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: -60px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    pointer-events: none;
+  }
+
+  .btn-icon-wrap {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 3px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-icon-wrap svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  .btn-text-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-label-ja {
+    font-size: 56px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .btn-label-en {
+    font-size: 26px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* ---- RIGHT BOTTOM — マイ予約・QR確認 / My Status (1000x423) ---- */
+  .btn-status {
+    width: var(--right-w);
+    height: var(--right-h2);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-status::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+
+  .btn-status::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+    pointer-events: none;
+  }
+
+  .status-label-ja {
+    font-size: 48px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .status-label-en {
+    font-size: 24px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* QA preview mode — shows bounding boxes */
+  body.qa-mode .panel-left  { outline: 3px solid lime; }
+  body.qa-mode .btn-reserve { outline: 3px solid cyan; }
+  body.qa-mode .btn-status  { outline: 3px solid yellow; }
+</style>
+</head>
+<body>
+<div id="richmenu">
+
+  <!-- ======================================================
+       LEFT — 試合情報 / Match Info
+       Action: uri → https://lp.northern-happinets.com/lp/game_20260124_20260125/
+  ====================================================== -->
+  <div class="panel-left">
+    <div class="left-inner">
+      <!-- Calendar icon (monochrome line) -->
+      <div class="icon-wrap">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#C8102E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="12" width="48" height="44" rx="4" ry="4"/>
+          <line x1="8" y1="24" x2="56" y2="24"/>
+          <line x1="20" y1="6" x2="20" y2="18"/>
+          <line x1="44" y1="6" x2="44" y2="18"/>
+          <rect x="18" y="31" width="10" height="10" rx="1"/>
+          <rect x="36" y="31" width="10" height="10" rx="1"/>
+          <rect x="18" y="47" width="10" height="10" rx="1"/>
+        </svg>
+      </div>
+
+      <div>
+        <div class="left-label-en">Match Info</div>
+        <div class="left-label-ja">試合情報</div>
+        <div class="left-label-sub">最新の試合スケジュールをチェック</div>
+      </div>
+
+      <!-- Arrow caret -->
+      <div class="left-caret">
+        <svg viewBox="0 0 28 28" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6,14 22,14"/>
+          <polyline points="16,8 22,14 16,20"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       RIGHT — 2 buttons stacked
+  ====================================================== -->
+  <div class="panel-right">
+
+    <!-- RIGHT TOP — バスを予約する / Reserve Bus
+         Action: postback data="bus:menu" displayText="バスを予約する"
+    -->
+    <div class="btn-reserve">
+      <div class="btn-icon-wrap">
+        <!-- Bus icon (monochrome line) -->
+        <svg viewBox="0 0 56 56" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="12" width="40" height="28" rx="4"/>
+          <line x1="8" y1="24" x2="48" y2="24"/>
+          <line x1="28" y1="12" x2="28" y2="24"/>
+          <circle cx="16" cy="42" r="4"/>
+          <circle cx="40" cy="42" r="4"/>
+          <line x1="8" y1="40" x2="12" y2="40"/>
+          <line x1="44" y1="40" x2="48" y2="40"/>
+          <line x1="4" y1="30" x2="8" y2="30"/>
+          <line x1="48" y1="30" x2="52" y2="30"/>
+        </svg>
+      </div>
+      <div class="btn-text-wrap">
+        <div class="btn-label-en">Reserve Bus</div>
+        <div class="btn-label-ja">バスを予約する</div>
+      </div>
+    </div>
+
+    <!-- RIGHT BOTTOM — マイ予約・QR確認 / My Status & QR
+         Action: uri → https://liff.line.me/2010371178-BqRvQ1H1
+    -->
+    <div class="btn-status">
+      <div class="btn-icon-wrap" style="border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.1);">
+        <!-- QR / ticket icon (monochrome line) -->
+        <svg viewBox="0 0 56 56" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <!-- QR squares -->
+          <rect x="8" y="8" width="16" height="16" rx="2"/>
+          <rect x="12" y="12" width="8" height="8" rx="1" fill="rgba(255,255,255,0.4)" stroke="none"/>
+          <rect x="32" y="8" width="16" height="16" rx="2"/>
+          <rect x="36" y="12" width="8" height="8" rx="1" fill="rgba(255,255,255,0.4)" stroke="none"/>
+          <rect x="8" y="32" width="16" height="16" rx="2"/>
+          <rect x="12" y="36" width="8" height="8" rx="1" fill="rgba(255,255,255,0.4)" stroke="none"/>
+          <!-- dots bottom right -->
+          <rect x="32" y="32" width="7" height="7" rx="1"/>
+          <rect x="41" y="32" width="7" height="7" rx="1"/>
+          <rect x="32" y="41" width="7" height="7" rx="1"/>
+          <rect x="41" y="41" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
+      <div>
+        <div class="status-label-en">My Status &amp; QR</div>
+        <div class="status-label-ja">マイ予約・QR確認</div>
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+</div><!-- /richmenu -->
+
+<!-- QA check script — run with ?qa=1 -->
+<script>
+(function() {
+  const params = new URLSearchParams(location.search);
+  if (!params.has('qa')) return;
+
+  const results = [];
+
+  // 1. Declared size match
+  const rm = document.getElementById('richmenu');
+  const rect = rm.getBoundingClientRect();
+  if (Math.abs(rect.width - 2500) > 1 || Math.abs(rect.height - 843) > 1) {
+    results.push('SIZE MISMATCH: got ' + rect.width + 'x' + rect.height + ' expected 2500x843');
+  }
+
+  // 2. Text overflow / clipping check
+  const textEls = document.querySelectorAll('.left-label-ja,.left-label-en,.left-label-sub,.btn-label-ja,.btn-label-en,.status-label-ja,.status-label-en');
+  textEls.forEach(function(el) {
+    const er = el.getBoundingClientRect();
+    const pr = el.parentElement.getBoundingClientRect();
+    if (er.width > pr.width + 4 || er.height > pr.height + 4) {
+      results.push('OVERFLOW: ' + (el.className || el.tagName) + ' w=' + er.width + ' h=' + er.height);
+    }
+  });
+
+  // 3. Element size anomaly (0 width/height)
+  const panels = document.querySelectorAll('.panel-left,.panel-right,.btn-reserve,.btn-status');
+  panels.forEach(function(el) {
+    const er = el.getBoundingClientRect();
+    if (er.width < 10 || er.height < 10) {
+      results.push('ZERO-SIZE: ' + el.className + ' w=' + er.width + ' h=' + er.height);
+    }
+  });
+
+  // 4. Text overlap check (simplified)
+  const allText = Array.from(textEls);
+  for (let i = 0; i < allText.length; i++) {
+    for (let j = i+1; j < allText.length; j++) {
+      const a = allText[i].getBoundingClientRect();
+      const b = allText[j].getBoundingClientRect();
+      const overlap = !(a.right < b.left || b.right < a.left || a.bottom < b.top || b.bottom < a.top);
+      if (overlap) {
+        results.push('OVERLAP: ' + (allText[i].className||'?') + ' vs ' + (allText[j].className||'?'));
+      }
+    }
+  }
+
+  // Render overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'qa-overlay';
+  overlay.style.cssText = 'position:fixed;top:20px;left:20px;z-index:9999;padding:20px 28px;border-radius:12px;font-family:monospace;font-size:24px;font-weight:bold;line-height:1.6;max-width:900px;word-break:break-all;';
+
+  if (results.length === 0) {
+    overlay.style.background = '#16A34A';
+    overlay.style.color = '#fff';
+    overlay.textContent = 'QA PASS — NG 0 / 4 checks';
+  } else {
+    overlay.style.background = '#DC2626';
+    overlay.style.color = '#fff';
+    overlay.innerHTML = 'QA FAIL — NG ' + results.length + '<br>' + results.join('<br>');
+  }
+  document.body.appendChild(overlay);
+})();
+</script>
+</body>
+</html>

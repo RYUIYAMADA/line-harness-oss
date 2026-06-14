@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "created": "2026-06-14",
+    "description": "bus-menu-v7 — 日英バイリンガル・文字伸びゼロ。v6の全action完全踏襲。",
+    "old_id": "richmenu-908f31e2ff22b32d97deb5ea236e53a2",
+    "new_id": "richmenu-5ec4d9f7a293bac6d3d39143534b39b7",
+    "rollback_cmd": "curl -s -X POST -H 'Authorization: Bearer $LINE_CHANNEL_ACCESS_TOKEN' 'https://api.line.me/v2/bot/user/all/richmenu/richmenu-908f31e2ff22b32d97deb5ea236e53a2'"
+  },
+  "richMenuId": "richmenu-5ec4d9f7a293bac6d3d39143534b39b7",
+  "size": { "width": 2500, "height": 843 },
+  "selected": true,
+  "name": "bus-menu-v7",
+  "chatBarText": "バス予約・マイ予約",
+  "areas": [
+    {
+      "_comment": "左大ボタン — 試合情報 / Match Info",
+      "bounds": { "x": 0, "y": 0, "width": 1500, "height": 843 },
+      "action": {
+        "type": "uri",
+        "label": "試合情報",
+        "uri": "https://lp.northern-happinets.com/lp/game_20260124_20260125/"
+      }
+    },
+    {
+      "_comment": "右上ボタン — バスを予約する / Reserve Bus",
+      "bounds": { "x": 1500, "y": 0, "width": 1000, "height": 420 },
+      "action": {
+        "type": "postback",
+        "label": "バスを予約する",
+        "data": "bus:menu",
+        "displayText": "バスを予約する"
+      }
+    },
+    {
+      "_comment": "右下ボタン — マイ予約・QR確認 / My Status & QR",
+      "bounds": { "x": 1500, "y": 420, "width": 1000, "height": 423 },
+      "action": {
+        "type": "uri",
+        "label": "マイ予約・QR確認",
+        "uri": "https://liff.line.me/2010371178-BqRvQ1H1"
+      }
+    }
+  ]
+}
