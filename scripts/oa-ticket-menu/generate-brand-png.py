@@ -365,14 +365,15 @@ def main_half():
     draw_ticket_icon   (draw, DIVX // 2,        icon_y, icon_size, PINK)
     draw_clipboard_icon(draw, DIVX + DIVX // 2, icon_y, icon_size, GOLD)
 
-    # フォントサイズ（843px高さ最適化）
+    # フォントサイズ（843px高さ最適化・2026-06-14 拡大）
     # DS no-rich-menu-small-text: 実画像28px以上必須
-    # 843pxは1686pxの半分 → 大版(160px)の約55% = 88px でバランス良し
-    font_ja_lg  = try_load_font(88)        # 予約する
-    font_ja_md  = try_load_font(84)        # 申し込み確認
-    font_en     = try_load_font_medium(44) # Reserve / Check Status
+    # 88→106px (+20%)、英語44→54px (+23%)
+    # 見切れチェック: text_top_y(~418) + ja_h(~106) + 14 + en_h(~54) + 余白(~20) < 843 ✅
+    font_ja_lg  = try_load_font(106)       # 予約する
+    font_ja_md  = try_load_font(102)       # 申し込み確認（6文字→幅に余裕あり）
+    font_en     = try_load_font_medium(54) # Reserve / Check Status
 
-    text_top_y = icon_y + icon_size // 2 + 32  # アイコン下端+余白
+    text_top_y = icon_y + icon_size // 2 + 28  # アイコン下端+余白
 
     # 左: 「予約する」
     label_left_ja = '予約する'
