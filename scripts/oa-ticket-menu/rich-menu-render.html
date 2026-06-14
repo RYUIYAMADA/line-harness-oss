@@ -3,44 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LINE リッチメニュー — 選手家族チケット（日英バイリンガル）</title>
+<title>LINE リッチメニュー — 秋田ノーザンハピネッツ チケット（ブランド公式カラー）</title>
 <style data-critical>
   :root {
-    /* LINE Dev DS tokens — tokens.css :root 全量コピー */
-    --color-line-green:         #06C755;
-    --color-primary:            #06C755;
-    --color-primary-hover:      #05A847;
-    --color-bg:                 #FFFFFF;
-    --color-bg-subtle:          #F5F5F5;
-    --color-text:               #1A1A2E;
-    --color-text-muted:         #6B7280;
-    --color-text-on-primary:    #FFFFFF;
-    --color-border:             #E5E7EB;
-    --color-happinets-red:      #C8102E;
-    --color-happinets-navy:     #152E58;
-    --fw-regular:               400;
-    --fw-medium:                500;
-    --fw-bold:                  700;
-    --spacing-1:                4px;
-    --spacing-2:                8px;
-    --spacing-3:                12px;
-    --spacing-4:                16px;
-    --spacing-5:                24px;
-    --spacing-6:                32px;
-    --spacing-7:                48px;
-    --spacing-8:                64px;
-    --radius-sm:                4px;
-    --radius-md:                8px;
-    --radius-lg:                16px;
-    --radius-full:              9999px;
-    --rich-menu-min-font-size:  24px;
-    --rich-menu-tap-cell-min:   72px;
+    /* ── ハピネッツ公式ブランドカラー（brand-colors.md 正本 2026-06-14） */
+    --happinets-pink:    #E40073;   /* C0/M100/Y15/K0 — プライマリ */
+    --happinets-black:   #000000;   /* ノーザンブラック */
+    --happinets-gold:    #BE8A23;   /* いなほゴールド — アクセント */
+    --happinets-white:   #FFFFFF;
+
+    /* 派生 */
+    --happinets-pink-dim:   rgba(228,0,115,0.12);
+    --happinets-gold-dim:   rgba(190,138,35,0.18);
+    --happinets-gold-line:  rgba(190,138,35,0.55);
+    --divider:              rgba(255,255,255,0.18);
+    --bg-dark:              #0D0D0D;   /* ほぼ黒ベース */
+    --bg-panel:             #111111;
+
+    /* typography */
+    --fw-bold:    700;
+    --fw-medium:  500;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: #333;
+    background: #2a2a2a;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -48,13 +36,14 @@
     padding: 32px;
     font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
     min-height: 100vh;
+    line-height: 1.7;
   }
 
   h1 {
     color: #fff;
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   .meta {
@@ -62,30 +51,31 @@
     font-size: 13px;
     margin-bottom: 16px;
     text-align: center;
+    line-height: 1.7;
   }
 
-  /* Preview wrapper: scale-down for screen viewing */
   .preview-wrap {
-    background: #fff;
+    background: #1a1a1a;
     border-radius: 8px;
     padding: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    border: 1px solid rgba(228,0,115,0.3);
   }
 
   canvas#preview {
     display: block;
-    /* Scale down for screen: 2500/4 = 625 */
+    /* Scale for screen: 2500/4 = 625 */
     width: 625px;
     height: 421.5px;
   }
 
-  canvas#export {
-    display: none; /* Hidden; actual export size */
-  }
+  canvas#export { display: none; }
 
   .actions {
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   button {
@@ -98,12 +88,17 @@
   }
 
   .btn-primary {
-    background: var(--color-line-green);
+    background: #E40073;
     color: #fff;
   }
 
   .btn-secondary {
-    background: #444;
+    background: #BE8A23;
+    color: #fff;
+  }
+
+  .btn-qa {
+    background: #333;
     color: #fff;
   }
 
@@ -112,29 +107,32 @@
     position: fixed;
     top: 16px;
     right: 16px;
-    background: rgba(0,0,0,0.88);
+    background: rgba(0,0,0,0.92);
     color: #fff;
     padding: 16px 20px;
     border-radius: 10px;
     font-size: 13px;
     z-index: 9999;
-    max-width: 320px;
+    max-width: 340px;
     line-height: 1.6;
   }
 
-  #qa-overlay.pass { border-left: 4px solid #06C755; }
+  #qa-overlay.pass { border-left: 4px solid #E40073; }
   #qa-overlay.fail { border-left: 4px solid #EF4444; }
 
   .qa-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-  .qa-item { margin: 4px 0; }
-  .qa-ok  { color: #4ade80; }
-  .qa-ng  { color: #f87171; }
+  .qa-item  { margin: 4px 0; }
+  .qa-ok    { color: #4ade80; }
+  .qa-ng    { color: #f87171; }
 </style>
 </head>
 <body>
 
-<h1>LINE リッチメニュー — 選手家族チケット予約</h1>
-<p class="meta">大サイズ: 2500 × 1686 px｜2カラム（左: 予約する/Reserve ／ 右: マイ申込状況/My Status）</p>
+<h1>秋田ノーザンハピネッツ — LINE チケットメニュー</h1>
+<p class="meta">
+  大サイズ: 2500 × 1686 px｜ハピネッツ公式ブランドカラー適用版<br>
+  左: 予約する / Reserve ／ 右: マイ申込状況 / My Status
+</p>
 
 <div class="preview-wrap">
   <canvas id="preview" width="2500" height="1686"></canvas>
@@ -142,7 +140,7 @@
 
 <div class="actions">
   <button class="btn-primary" onclick="downloadPNG()">PNG ダウンロード（2500×1686）</button>
-  <button class="btn-secondary" onclick="runQA()">機械QA 実行</button>
+  <button class="btn-qa" onclick="runQA()">機械QA 実行</button>
 </div>
 
 <div id="qa-overlay">
@@ -154,271 +152,25 @@
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
-// DS Tokens (copied from tokens.json)
+// ハピネッツ公式ブランドトークン（brand-colors.md 2026-06-14 正本）
 // ─────────────────────────────────────────────────────────────────────────────
-const DS = {
-  lineGreen:       '#06C755',
-  happinetsNavy:   '#152E58',
-  happinetsRed:    '#C8102E',
-  bg:              '#FFFFFF',
-  bgSubtle:        '#F5F5F5',
-  text:            '#1A1A2E',
-  textMuted:       '#6B7280',
-  textOnPrimary:   '#FFFFFF',
-  border:          '#E5E7EB',
+const BRAND = {
+  pink:       '#E40073',   // ハピネッツピンク（マゼンタ） — プライマリ
+  black:      '#000000',   // ノーザンブラック
+  gold:       '#BE8A23',   // いなほゴールド — アクセント
+  white:      '#FFFFFF',
+  bgBase:     '#0C0C0C',   // 漆黒ベース（スポーツ・ダークステージ感）
+  bgPanel:    '#121212',
+  pinkDim:    'rgba(228,0,115,0.10)',
+  pinkGlow:   'rgba(228,0,115,0.22)',
+  goldLine:   'rgba(190,138,35,0.60)',
+  goldDim:    'rgba(190,138,35,0.14)',
+  divider:    'rgba(255,255,255,0.16)',
+  textSub:    'rgba(255,255,255,0.55)',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RENDER — draw rich menu onto canvas
-// W=2500, H=1686 (LINE spec: full size)
-// ─────────────────────────────────────────────────────────────────────────────
-function drawRichMenu(canvas) {
-  const W = 2500;
-  const H = 1686;
-  const ctx = canvas.getContext('2d');
-
-  // ── Background ──────────────────────────────────────────────────────────────
-  ctx.fillStyle = DS.happinetsNavy;  // dark navy base
-  ctx.fillRect(0, 0, W, H);
-
-  // ── Subtle grid accent lines (very low opacity) ──────────────────────────
-  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  ctx.lineWidth = 1;
-  for (let x = 0; x < W; x += 100) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-  }
-  for (let y = 0; y < H; y += 100) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  }
-
-  // ── Divider line between left and right ─────────────────────────────────
-  const divX = W / 2;  // 1250
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(divX, 40);
-  ctx.lineTo(divX, H - 40);
-  ctx.stroke();
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // LEFT PANEL: 予約する / Reserve
-  // ─────────────────────────────────────────────────────────────────────────
-  drawPanel(ctx, {
-    x: 0, y: 0, w: divX, h: H,
-    accent: DS.lineGreen,
-    iconType: 'ticket',
-    labelJa: '予約する',
-    labelEn: 'Reserve',
-  });
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // RIGHT PANEL: マイ申込状況 / My Status
-  // ─────────────────────────────────────────────────────────────────────────
-  drawPanel(ctx, {
-    x: divX, y: 0, w: divX, h: H,
-    accent: '#F59E0B',       // warm amber — distinct from green
-    iconType: 'clipboard',
-    labelJa: 'マイ申込状況',
-    labelEn: 'My Status',
-  });
-
-  // ── Bottom brand strip ────────────────────────────────────────────────────
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  ctx.fillRect(0, H - 80, W, 80);
-
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.font = '500 36px -apple-system, "Hiragino Sans", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('秋田ノーザンハピネッツ — 選手家族チケット', W / 2, H - 40);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// drawPanel — one half-panel
-// ─────────────────────────────────────────────────────────────────────────────
-function drawPanel(ctx, { x, y, w, h, accent, iconType, labelJa, labelEn }) {
-  const cx = x + w / 2;  // center x of this panel
-  const cy = h / 2;
-
-  // Hover-like highlight circle (very subtle)
-  const grad = ctx.createRadialGradient(cx, cy - 60, 0, cx, cy - 60, 480);
-  grad.addColorStop(0, `${accent}22`);
-  grad.addColorStop(1, 'transparent');
-  ctx.fillStyle = grad;
-  ctx.fillRect(x, y, w, h);
-
-  // ── Accent color bar at top ────────────────────────────────────────────────
-  ctx.fillStyle = accent;
-  ctx.fillRect(x + 60, y + 0, w - 120, 12);
-
-  // ── Icon (monochrome line, SVG-on-canvas equivalent) ──────────────────────
-  const iconY = cy - 180;
-  const iconSize = 300;
-  drawIcon(ctx, cx, iconY, iconSize, accent, iconType);
-
-  // ── Japanese label ────────────────────────────────────────────────────────
-  // Max chars: 7 (マイ申込状況) — must never clip at 2500×1686
-  const jaSize = labelJa.length <= 5 ? 180 : 155;
-  ctx.font = `700 ${jaSize}px -apple-system, "Hiragino Sans", sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.shadowBlur = 20;
-  ctx.fillText(labelJa, cx, cy + 110);
-  ctx.shadowBlur = 0;
-
-  // ── English label ─────────────────────────────────────────────────────────
-  const enSize = 90;
-  ctx.font = `500 ${enSize}px -apple-system, "Hiragino Sans", sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = `${accent}EE`;
-  ctx.fillText(labelEn, cx, cy + 240);
-
-  // ── Tap affordance: rounded rect button outline ───────────────────────────
-  const btnW = w - 240;
-  const btnH = 160;
-  const btnX = x + 120;
-  const btnY = cy + 280;
-  roundRect(ctx, btnX, btnY, btnW, btnH, 40);
-  ctx.strokeStyle = `${accent}99`;
-  ctx.lineWidth = 6;
-  ctx.stroke();
-
-  // Arrow inside button
-  const arrCx = cx;
-  const arrCy = btnY + btnH / 2;
-  ctx.fillStyle = accent;
-  ctx.beginPath();
-  ctx.moveTo(arrCx - 24, arrCy - 24);
-  ctx.lineTo(arrCx + 24, arrCy);
-  ctx.lineTo(arrCx - 24, arrCy + 24);
-  ctx.closePath();
-  ctx.fill();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// drawIcon — monochrome line icons (ticket / clipboard)
-// itshover style: thin stroke, no fill, single color
-// ─────────────────────────────────────────────────────────────────────────────
-function drawIcon(ctx, cx, cy, size, color, type) {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.fillStyle = 'transparent';
-  ctx.lineWidth = size * 0.065;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  const s = size * 0.4;  // half-size for geometry
-
-  if (type === 'ticket') {
-    // Ticket: rectangle with notches on top and bottom center
-    const tw = s * 2.2;
-    const th = s * 1.4;
-    const tx = cx - tw / 2;
-    const tcy = cy;
-
-    // Main body
-    ctx.strokeRect(tx, tcy - th / 2, tw, th);
-
-    // Notch circles (perforation style) — top and bottom center
-    const notchR = th * 0.18;
-    // Top notch
-    ctx.beginPath();
-    ctx.arc(cx, tcy - th / 2, notchR, 0, Math.PI, false);
-    ctx.fillStyle = DS.happinetsNavy;
-    ctx.fill();
-    ctx.stroke();
-    // Bottom notch
-    ctx.beginPath();
-    ctx.arc(cx, tcy + th / 2, notchR, Math.PI, 0, false);
-    ctx.fill();
-    ctx.stroke();
-
-    // Dashed perforation line (vertical center)
-    ctx.setLineDash([th * 0.08, th * 0.08]);
-    ctx.beginPath();
-    ctx.moveTo(cx, tcy - th / 2 + notchR * 1.5);
-    ctx.lineTo(cx, tcy + th / 2 - notchR * 1.5);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Star / price area lines (left half)
-    ctx.lineWidth = size * 0.04;
-    ctx.beginPath();
-    ctx.moveTo(tx + tw * 0.12, tcy - th * 0.22);
-    ctx.lineTo(cx - tw * 0.08, tcy - th * 0.22);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(tx + tw * 0.12, tcy);
-    ctx.lineTo(cx - tw * 0.08, tcy);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(tx + tw * 0.12, tcy + th * 0.22);
-    ctx.lineTo(cx - tw * 0.08, tcy + th * 0.22);
-    ctx.stroke();
-
-  } else if (type === 'clipboard') {
-    // Clipboard: board with clip at top
-    const bw = s * 1.8;
-    const bh = s * 2.2;
-    const bx = cx - bw / 2;
-    const by = cy - bh / 2 + s * 0.2;
-    const cr = bw * 0.1; // corner radius
-
-    // Board body
-    roundRect(ctx, bx, by, bw, bh, cr);
-    ctx.strokeStyle = color;
-    ctx.fillStyle = 'transparent';
-    ctx.stroke();
-
-    // Clip (U-shape at top)
-    const clipW = bw * 0.42;
-    const clipH = s * 0.55;
-    const clipX = cx - clipW / 2;
-    const clipY = by - clipH * 0.5;
-    roundRect(ctx, clipX, clipY, clipW, clipH, clipH / 2);
-    ctx.fillStyle = DS.happinetsNavy;
-    ctx.fill();
-    ctx.strokeStyle = color;
-    ctx.stroke();
-
-    // Lines on board (list items)
-    const lx1 = bx + bw * 0.15;
-    const lx2 = bx + bw * 0.85;
-    const ly0 = by + bh * 0.28;
-    const gap = bh * 0.18;
-    ctx.lineWidth = size * 0.05;
-    for (let i = 0; i < 3; i++) {
-      const ly = ly0 + gap * i;
-      // Checkbox square
-      const cbSize = bh * 0.1;
-      ctx.strokeStyle = color;
-      ctx.strokeRect(lx1, ly - cbSize / 2, cbSize, cbSize);
-      // Check mark on first item
-      if (i === 0) {
-        ctx.lineWidth = size * 0.04;
-        ctx.beginPath();
-        ctx.moveTo(lx1 + cbSize * 0.15, ly + cbSize * 0.05);
-        ctx.lineTo(lx1 + cbSize * 0.45, ly + cbSize * 0.3);
-        ctx.lineTo(lx1 + cbSize * 0.9, ly - cbSize * 0.2);
-        ctx.stroke();
-        ctx.lineWidth = size * 0.05;
-      }
-      // Line next to checkbox
-      ctx.beginPath();
-      ctx.moveTo(lx1 + cbSize + bw * 0.06, ly);
-      ctx.lineTo(i === 2 ? lx2 - bw * 0.15 : lx2, ly);
-      ctx.stroke();
-    }
-  }
-
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Utility: roundRect path
+// roundRect utility
 // ─────────────────────────────────────────────────────────────────────────────
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -435,17 +187,341 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Init: draw on preview canvas
+// drawBadge — ゴールドアクセント細線バッジ（上端装飾）
+// ─────────────────────────────────────────────────────────────────────────────
+function drawTopAccentBar(ctx, x, w, color, thickness = 14) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, 0, w, thickness);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// drawDiagonalPattern — 斜めストライプ背景（スポーツ感）
+// ─────────────────────────────────────────────────────────────────────────────
+function drawDiagonalPattern(ctx, x, y, w, h, color) {
+  ctx.save();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  const spacing = 80;
+  for (let i = -h; i < w + h; i += spacing) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, y);
+    ctx.lineTo(x + i + h, y + h);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// drawTicketIcon — モノクロ線アイコン（itshoverスタイル）
+// ─────────────────────────────────────────────────────────────────────────────
+function drawTicketIcon(ctx, cx, cy, size, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = size * 0.055;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const tw = size * 0.88;
+  const th = size * 0.56;
+  const tx = cx - tw / 2;
+  const ty = cy - th / 2;
+  const notchR = th * 0.20;
+
+  // メイン外枠
+  ctx.strokeRect(tx, ty, tw, th);
+
+  // 左ノッチ（半円くり抜き）
+  ctx.beginPath();
+  ctx.arc(tx, cy, notchR, -Math.PI / 2, Math.PI / 2, false);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+
+  // 右ノッチ
+  ctx.beginPath();
+  ctx.arc(tx + tw, cy, notchR, Math.PI / 2, -Math.PI / 2, false);
+  ctx.stroke();
+
+  // 破線区切り（縦）
+  ctx.setLineDash([th * 0.09, th * 0.07]);
+  ctx.beginPath();
+  ctx.moveTo(tx + tw * 0.38, ty + th * 0.12);
+  ctx.lineTo(tx + tw * 0.38, ty + th * 0.88);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 右エリア: 右向き三角形（CTA感）
+  ctx.lineWidth = size * 0.045;
+  const ax = cx + tw * 0.18;
+  const arrowSize = th * 0.22;
+  ctx.beginPath();
+  ctx.moveTo(ax - arrowSize * 0.6, cy - arrowSize * 0.9);
+  ctx.lineTo(ax + arrowSize * 0.6, cy);
+  ctx.lineTo(ax - arrowSize * 0.6, cy + arrowSize * 0.9);
+  ctx.stroke();
+
+  // 左エリア: 横線3本（チケット番号感）
+  ctx.lineWidth = size * 0.038;
+  const lx1 = tx + tw * 0.06;
+  const lx2 = tx + tw * 0.32;
+  [cy - th * 0.22, cy, cy + th * 0.22].forEach(ly => {
+    ctx.beginPath();
+    ctx.moveTo(lx1, ly);
+    ctx.lineTo(lx2, ly);
+    ctx.stroke();
+  });
+
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// drawClipboardIcon — モノクロ線アイコン（itshoverスタイル）
+// ─────────────────────────────────────────────────────────────────────────────
+function drawClipboardIcon(ctx, cx, cy, size, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = size * 0.055;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const bw = size * 0.72;
+  const bh = size * 0.88;
+  const bx = cx - bw / 2;
+  const by = cy - bh / 2 + size * 0.08;
+  const cr = bw * 0.08;
+
+  // ボード本体
+  roundRect(ctx, bx, by, bw, bh, cr);
+  ctx.stroke();
+
+  // クリップ（上部Uシェイプ）
+  const clipW = bw * 0.40;
+  const clipH = size * 0.20;
+  const clipX = cx - clipW / 2;
+  const clipY = by - clipH * 0.55;
+  ctx.lineWidth = size * 0.05;
+  roundRect(ctx, clipX, clipY, clipW, clipH, clipH / 2);
+  ctx.stroke();
+
+  // チェックリスト3行
+  const lx1 = bx + bw * 0.14;
+  const lx2 = bx + bw * 0.86;
+  const ly0 = by + bh * 0.26;
+  const gap = bh * 0.20;
+  ctx.lineWidth = size * 0.045;
+
+  for (let i = 0; i < 3; i++) {
+    const ly = ly0 + gap * i;
+    const cbS = bh * 0.10;
+
+    // チェックボックス
+    ctx.strokeRect(lx1, ly - cbS / 2, cbS, cbS);
+
+    // 1行目だけチェックマーク
+    if (i === 0) {
+      ctx.lineWidth = size * 0.038;
+      ctx.beginPath();
+      ctx.moveTo(lx1 + cbS * 0.12, ly + cbS * 0.05);
+      ctx.lineTo(lx1 + cbS * 0.42, ly + cbS * 0.28);
+      ctx.lineTo(lx1 + cbS * 0.88, ly - cbS * 0.20);
+      ctx.stroke();
+      ctx.lineWidth = size * 0.045;
+    }
+
+    // テキスト横線
+    const lineEnd = i === 2 ? lx2 - bw * 0.14 : lx2;
+    ctx.beginPath();
+    ctx.moveTo(lx1 + cbS + bw * 0.06, ly);
+    ctx.lineTo(lineEnd, ly);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// drawPanel — 左右各パネル
+// ─────────────────────────────────────────────────────────────────────────────
+function drawPanel(ctx, { x, w, h, accent, accentDim, iconType, labelJa, labelEn, side }) {
+  const cx = x + w / 2;
+  const cy = h / 2;
+
+  // ── ラジアルグロー（中央から広がる）
+  const glow = ctx.createRadialGradient(cx, cy - 100, 0, cx, cy - 100, 700);
+  glow.addColorStop(0, accentDim);
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(x, 0, w, h);
+
+  // ── 斜めストライプ（背景テクスチャ。非常に淡い）
+  drawDiagonalPattern(ctx, x, 0, w, h, 'rgba(255,255,255,0.022)');
+
+  // ── 上端アクセントバー（メインカラー）
+  ctx.fillStyle = accent;
+  ctx.fillRect(x + 80, 0, w - 160, 12);
+
+  // ── ゴールド細線（下端アクセント）
+  ctx.fillStyle = BRAND.goldLine;
+  ctx.fillRect(x + 60, h - 8, w - 120, 3);
+
+  // ── アイコン描画（モノクロ線・単色）
+  const iconSize = 300;
+  const iconY = cy - 205;
+  if (iconType === 'ticket') {
+    drawTicketIcon(ctx, cx, iconY, iconSize, accent);
+  } else {
+    drawClipboardIcon(ctx, cx, iconY, iconSize, accent);
+  }
+
+  // ── 日本語ラベル（主テキスト）
+  const jaSize = labelJa.length <= 4 ? 180 : labelJa.length <= 5 ? 165 : 148;
+  ctx.font = `700 ${jaSize}px -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = BRAND.white;
+  ctx.shadowColor = 'rgba(0,0,0,0.7)';
+  ctx.shadowBlur = 24;
+  ctx.fillText(labelJa, cx, cy + 100);
+  ctx.shadowBlur = 0;
+
+  // ── 英語ラベル（サブテキスト）
+  const enSize = 86;
+  ctx.font = `500 ${enSize}px -apple-system, "Hiragino Sans", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = accent;
+  ctx.globalAlpha = 0.90;
+  ctx.fillText(labelEn, cx, cy + 220);
+  ctx.globalAlpha = 1.0;
+
+  // ── CTAボタン外枠
+  const btnW = w - 260;
+  const btnH = 148;
+  const btnX = x + 130;
+  const btnY = cy + 265;
+  roundRect(ctx, btnX, btnY, btnW, btnH, 38);
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 5;
+  ctx.globalAlpha = 0.65;
+  ctx.stroke();
+  ctx.globalAlpha = 1.0;
+
+  // ── CTAボタン内: タップ矢印（右三角形）
+  const arrCx = cx;
+  const arrCy = btnY + btnH / 2;
+  const arrS = 28;
+  ctx.fillStyle = accent;
+  ctx.globalAlpha = 0.80;
+  ctx.beginPath();
+  ctx.moveTo(arrCx - arrS * 0.7, arrCy - arrS);
+  ctx.lineTo(arrCx + arrS * 0.9, arrCy);
+  ctx.lineTo(arrCx - arrS * 0.7, arrCy + arrS);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// drawRichMenu — メインレンダラー
+// ─────────────────────────────────────────────────────────────────────────────
+function drawRichMenu(canvas) {
+  const W = 2500;
+  const H = 1686;
+  const ctx = canvas.getContext('2d');
+
+  // ── ベース背景（漆黒）
+  ctx.fillStyle = BRAND.bgBase;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── 微妙なパネル分け（左右で微差の背景）
+  ctx.fillStyle = 'rgba(228,0,115,0.025)';
+  ctx.fillRect(0, 0, W / 2, H);
+
+  ctx.fillStyle = 'rgba(190,138,35,0.025)';
+  ctx.fillRect(W / 2, 0, W / 2, H);
+
+  // ── 中央分割線
+  const divX = W / 2;
+  ctx.strokeStyle = BRAND.divider;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(divX, 30);
+  ctx.lineTo(divX, H - 30);
+  ctx.stroke();
+
+  // ── 中央分割線ゴールドアクセント（細）
+  ctx.strokeStyle = BRAND.goldLine;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(divX, 0);
+  ctx.lineTo(divX, H);
+  ctx.stroke();
+
+  // ── 左パネル: 予約する / Reserve（ピンク）
+  drawPanel(ctx, {
+    x: 0,
+    w: divX,
+    h: H,
+    accent: BRAND.pink,
+    accentDim: BRAND.pinkDim,
+    iconType: 'ticket',
+    labelJa: '予約する',
+    labelEn: 'Reserve',
+    side: 'left',
+  });
+
+  // ── 右パネル: マイ申込状況 / My Status（ゴールド）
+  drawPanel(ctx, {
+    x: divX,
+    w: divX,
+    h: H,
+    accent: BRAND.gold,
+    accentDim: BRAND.goldDim,
+    iconType: 'clipboard',
+    labelJa: 'マイ申込状況',
+    labelEn: 'My Status',
+    side: 'right',
+  });
+
+  // ── 下部ブランドフッター
+  const footerH = 90;
+  const footerGrad = ctx.createLinearGradient(0, H - footerH, 0, H);
+  footerGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  footerGrad.addColorStop(1, 'rgba(0,0,0,0.75)');
+  ctx.fillStyle = footerGrad;
+  ctx.fillRect(0, H - footerH, W, footerH);
+
+  // ブランド名テキスト
+  ctx.font = '500 34px -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255,255,255,0.40)';
+  ctx.fillText('AKITA NORTHERN HAPPINETS', W / 2, H - 44);
+
+  // ゴールドドット区切り
+  ctx.fillStyle = BRAND.gold;
+  ctx.globalAlpha = 0.55;
+  ctx.beginPath();
+  ctx.arc(W / 2 - 320, H - 44, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(W / 2 + 320, H - 44, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Init
 // ─────────────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const preview = document.getElementById('preview');
   drawRichMenu(preview);
-  // Auto-run QA after render
-  setTimeout(runQA, 300);
+  setTimeout(runQA, 400);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Download as PNG (actual 2500×1686)
+// ダウンロード（実サイズ 2500×1686）
 // ─────────────────────────────────────────────────────────────────────────────
 function downloadPNG() {
   const exportCanvas = document.getElementById('export');
@@ -453,115 +529,105 @@ function downloadPNG() {
   exportCanvas.height = 1686;
   drawRichMenu(exportCanvas);
 
-  // Verify declared vs actual size
-  const actualW = exportCanvas.width;
-  const actualH = exportCanvas.height;
-  if (actualW !== 2500 || actualH !== 1686) {
-    alert(`❌ サイズ不一致: ${actualW}×${actualH} (期待: 2500×1686)`);
+  if (exportCanvas.width !== 2500 || exportCanvas.height !== 1686) {
+    alert(`サイズ不一致: ${exportCanvas.width}×${exportCanvas.height}`);
     return;
   }
 
   exportCanvas.toBlob(blob => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'hapinets-rich-menu-2500x1686.png';
+    a.download = 'hapinets-ticket-menu-2500x1686.png';
     a.click();
     URL.revokeObjectURL(a.href);
   }, 'image/png');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// QA Check
+// 機械QA
 // ─────────────────────────────────────────────────────────────────────────────
 function runQA() {
   const overlay = document.getElementById('qa-overlay');
   const body    = document.getElementById('qa-body');
   const title   = document.getElementById('qa-title');
+  const cv      = document.getElementById('preview');
+  const ctx     = cv.getContext('2d');
 
   const checks = [];
   let ngCount = 0;
 
-  // ── QA 1: Canvas actual size == declared size ─────────────────────────────
-  const cv = document.getElementById('preview');
-  const declW = cv.width;
-  const declH = cv.height;
-  // The CSS sets display size but canvas.width/height = actual pixels
-  if (declW === 2500 && declH === 1686) {
-    checks.push({ ok: true, label: '宣言=実サイズ一致 (2500×1686)' });
+  function pass(label) { checks.push({ ok: true,  label }); }
+  function fail(label) { checks.push({ ok: false, label }); ngCount++; }
+
+  // QA1: 宣言サイズ == 2500×1686
+  if (cv.width === 2500 && cv.height === 1686) {
+    pass('宣言=実サイズ一致 (2500×1686)');
   } else {
-    checks.push({ ok: false, label: `サイズ不一致: canvas ${declW}×${declH} ≠ 2500×1686` });
-    ngCount++;
+    fail(`サイズ不一致: ${cv.width}×${cv.height} ≠ 2500×1686`);
   }
 
-  // ── QA 2: Canvas renders content (not blank) — sample pixels ────────────
-  const ctx = cv.getContext('2d');
-  // Sample left panel center: should NOT be the navy background pure color
-  // (icons / labels overlay it, so pixel variance should exist)
-  const imgData = ctx.getImageData(200, 600, 1, 1);
-  const [r, g, b, a] = imgData.data;
-  const hasContent = !(r === 21 && g === 46 && b === 88);  // not pure navy
-  if (hasContent) {
-    checks.push({ ok: true, label: 'キャンバスに描画コンテンツあり（非空白）' });
+  // QA2: キャンバスに描画コンテンツ（非空白）
+  const px = ctx.getImageData(200, 600, 1, 1).data;
+  const isBlank = (px[0] < 15 && px[1] < 15 && px[2] < 15 && px[3] === 255);
+  // 漆黒(#0C0C0C)より明るい描画があるか — 中央部分を確認
+  const px2 = ctx.getImageData(625, 843, 1, 1).data;  // 左パネル中央
+  const px3 = ctx.getImageData(1875, 843, 1, 1).data; // 右パネル中央
+  const leftHasContent  = !(px2[0] < 15 && px2[1] < 15 && px2[2] < 15);
+  const rightHasContent = !(px3[0] < 15 && px3[1] < 15 && px3[2] < 15);
+  if (leftHasContent && rightHasContent) {
+    pass('左右パネル両方に描画コンテンツあり');
   } else {
-    checks.push({ ok: false, label: 'キャンバスが空白（レンダリング未完了）' });
-    ngCount++;
+    fail(`描画不備: 左=${leftHasContent ? 'OK' : 'NG'}, 右=${rightHasContent ? 'OK' : 'NG'}`);
   }
 
-  // ── QA 3: Text label length check — longest is "マイ申込状況" (7 chars) ──
-  // We'll verify font size is within safe range for 1250px wide panel
-  // At 155px font, 7 chars × ~150px ≈ 1050px < 1250px panel width → safe
-  const longestLabel = 'マイ申込状況';
-  const maxFontPx = 155;
-  const estimatedWidth = longestLabel.length * maxFontPx * 0.95;  // ~0.95 em for Japanese
-  const panelW = 1250;
-  const safeMargin = 120 * 2;  // padding each side
-  if (estimatedWidth < (panelW - safeMargin)) {
-    checks.push({ ok: true, label: `最長ラベル「${longestLabel}」(${longestLabel.length}文字×${maxFontPx}px) 推定幅 ${Math.round(estimatedWidth)}px < 利用可能幅 ${panelW - safeMargin}px` });
-  } else {
-    checks.push({ ok: false, label: `ラベル幅超過リスク: ${Math.round(estimatedWidth)}px > ${panelW - safeMargin}px` });
-    ngCount++;
-  }
-
-  // ── QA 4: Canvas measure API text width check ─────────────────────────────
+  // QA3: 最長ラベル幅チェック（Canvas measureText）
   try {
-    const measureCtx = cv.getContext('2d');
-    measureCtx.font = `700 155px -apple-system, "Hiragino Sans", sans-serif`;
-    const m = measureCtx.measureText('マイ申込状況');
-    const mw = m.width;
-    if (mw < 1010) {  // 1250 panel - 240 padding
-      checks.push({ ok: true, label: `Canvas measureText「マイ申込状況」= ${Math.round(mw)}px (上限 1010px 以内)` });
+    ctx.font = `700 148px -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif`;
+    const mw = ctx.measureText('マイ申込状況').width;
+    const maxW = 1250 - 260; // パネル幅 - 両側パディング
+    if (mw < maxW) {
+      pass(`measureText「マイ申込状況」= ${Math.round(mw)}px < 上限 ${maxW}px`);
     } else {
-      checks.push({ ok: false, label: `テキスト幅超過: measureText = ${Math.round(mw)}px > 1010px` });
-      ngCount++;
+      fail(`テキスト幅超過: ${Math.round(mw)}px > ${maxW}px`);
     }
-  } catch(e) {
-    checks.push({ ok: false, label: `measureText エラー: ${e.message}` });
-    ngCount++;
+  } catch (e) {
+    fail(`measureText エラー: ${e.message}`);
   }
 
-  // ── QA 5: Divider position check (left half ≠ right half) ────────────────
-  // Sample pixel at exact divider x=1250 vs x=1249 (left side)
-  const leftPx  = ctx.getImageData(400, 843, 1, 1).data;   // left panel center
-  const rightPx = ctx.getImageData(2100, 843, 1, 1).data;  // right panel center
-  // Both sides should render something (a>0 = opaque)
-  if (leftPx[3] === 255 && rightPx[3] === 255) {
-    checks.push({ ok: true, label: '左右パネル両方に描画あり（不透明）' });
-  } else {
-    checks.push({ ok: false, label: `パネル描画不備: left alpha=${leftPx[3]}, right alpha=${rightPx[3]}` });
-    ngCount++;
+  // QA4: 左パネルラベル幅チェック
+  try {
+    ctx.font = `700 165px -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif`;
+    const mw = ctx.measureText('予約する').width;
+    const maxW = 1250 - 260;
+    if (mw < maxW) {
+      pass(`measureText「予約する」= ${Math.round(mw)}px < 上限 ${maxW}px`);
+    } else {
+      fail(`テキスト幅超過(予約する): ${Math.round(mw)}px > ${maxW}px`);
+    }
+  } catch (e) {
+    fail(`measureText エラー: ${e.message}`);
   }
 
-  // ── QA 6: Color contrast sanity (text #FFFFFF on navy #152E58) ───────────
-  // Luminance of #152E58 = 0.024, #FFFFFF = 1.0 → ratio = (1+0.05)/(0.024+0.05) ≈ 14.2
-  const contrastRatio = (1 + 0.05) / (0.024 + 0.05);
+  // QA5: コントラスト比 — 白テキスト on #0C0C0C
+  // L(#0C0C0C) ≈ 0.002, L(#FFFFFF) = 1.0 → ratio = (1+0.05)/(0.002+0.05) ≈ 20.2
+  const contrastRatio = (1.0 + 0.05) / (0.002 + 0.05);
   if (contrastRatio >= 4.5) {
-    checks.push({ ok: true, label: `コントラスト比 白/#152E58 ≈ ${contrastRatio.toFixed(1)}:1 (WCAG AA ≥4.5 クリア)` });
+    pass(`コントラスト比 白/#0C0C0C ≈ ${contrastRatio.toFixed(1)}:1 (WCAG AA 4.5 超)`);
   } else {
-    checks.push({ ok: false, label: `コントラスト不足: ${contrastRatio.toFixed(1)}:1 < 4.5` });
-    ngCount++;
+    fail(`コントラスト不足: ${contrastRatio.toFixed(1)}:1 < 4.5`);
   }
 
-  // ── Render overlay ─────────────────────────────────────────────────────────
+  // QA6: ピンクアイコン色がブランド正規値 #E40073 に一致 (r=228, g=0, b=115)
+  // アクセントバー（上端）をサンプリング: x=300, y=5
+  const accentPx = ctx.getImageData(300, 5, 1, 1).data;
+  const pinkMatch = (accentPx[0] > 200 && accentPx[1] < 20 && accentPx[2] > 80);
+  if (pinkMatch) {
+    pass(`上端アクセントバーにハピネッツピンク (#E40073) を検出`);
+  } else {
+    fail(`ピンクアクセントバー未検出: rgb(${accentPx[0]},${accentPx[1]},${accentPx[2]})`);
+  }
+
+  // ── 結果描画
   const passAll = ngCount === 0;
   overlay.className = passAll ? 'pass' : 'fail';
   title.textContent = passAll
@@ -574,7 +640,6 @@ function runQA() {
 
   overlay.style.display = 'block';
 
-  // Log to console
   console.log(`[QA] NG: ${ngCount}/${checks.length}`);
   checks.forEach(c => console.log(`  ${c.ok ? 'PASS' : 'FAIL'} — ${c.label}`));
 
